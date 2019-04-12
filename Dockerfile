@@ -1,20 +1,21 @@
-FROM alpine:latest
+FROM ruby:2.6-alpine3.9
+MAINTAINER Vuong Hoang <vuongh3@fpt.com.vn>
 
-LABEL maintainer "Vuong HQ <vuonghq3@fpt.com.vn>"
+# Install build base, supervisor, set timezone
+RUN apk add autoconf automake ca-certificates make bash build-base supervisor tzdata \
+    && cp /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime \
+    && echo "Asia/Ho_Chi_Minh" > /etc/timezone \
+    && mkdir -p /var/log/supervisor
 
-# install dependencies
-RUN apk add --update g++ libtool make automake curl autoconf supervisor
-
-# copy files and create necessary folders
-RUN mkdir -p /var/log/supervisor
+# Copy supervisor config file
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# compile twemproxy
-RUN curl -qL https://github.com/twitter/twemproxy/archive/v0.4.1.tar.gz | tar xzf -
-RUN cd  twemproxy-0.4.1 && autoreconf -fvi && ./configure --enable-debug=log && make && make install
+# Install nutcracker, nutcracker-web
+RUN gem install nutcracker \
+    && gem install nutcracker-web
 
-RUN apk del g++ libtool make automake curl autoconf
+# Expose port
+EXPOSE 9292 22222 22100 22101 22110 22111
 
-EXPOSE 22100 22101 22102 22013
-
+# Start service
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
