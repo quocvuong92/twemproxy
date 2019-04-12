@@ -2,7 +2,7 @@ FROM ruby:2.6-alpine3.9
 MAINTAINER Vuong Hoang <vuongh3@fpt.com.vn>
 
 # Install build base, supervisor, set timezone
-RUN apk add autoconf automake ca-certificates make bash build-base supervisor tzdata \
+RUN apk add --no-cache autoconf automake ca-certificates make bash build-base supervisor tzdata \
     && cp /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime \
     && echo "Asia/Ho_Chi_Minh" > /etc/timezone \
     && mkdir -p /var/log/supervisor
