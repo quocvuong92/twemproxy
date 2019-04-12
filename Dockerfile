@@ -14,6 +14,10 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN gem install nutcracker \
     && gem install nutcracker-web
 
+# Delete cache
+RUN apk del make automake autoconf build-base \
+    && rm -rf /var/cache/apk/* /tmp/*
+
 # Expose port
 EXPOSE 9292 22222 22100 22101 22110 22111
 
